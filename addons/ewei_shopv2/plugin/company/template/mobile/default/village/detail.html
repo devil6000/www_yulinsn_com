@@ -1,0 +1,28 @@
+{template '_header'}
+<style type="text/css">
+    .header-color { background-color: #06b691;}
+    .fui-header a.back:before { border-color: #ffffff;}
+    .fui-detail-group { margin-top: 0;}
+    .fui-cell-title { font-size: 1rem; color: #000;}
+    .fui-cell-group .fui-cell:before { border: none;}
+    .fui-cell-credit { color: #a4a4a4;}
+    .fui-cell-content { padding: 0.75rem 0.6rem 0.65rem; }
+    .fui-cell-content p { line-height: 1.5rem;}
+</style>
+<div class="fui-page fui-page-current">
+    <div class="fui-header header-color">
+        <div class="fui-header-left"><a class="back"></a></div>
+        <div class="title" style="color: #ffffff;">乡村旅游</div>
+        <div class="fui-header-right"></div>
+    </div>
+    <div class="fui-content navbar">
+        <div class="fui-cell-group fui-detail-group">
+            <div class="fui-cell fui-cell-title">
+                {$article['title']}
+            </div>
+            <div class="fui-cell fui-cell-credit">发布时间: {php echo date('Y年m月d日', $article['createtime'])} 浏览: {$article['click']}</div>
+            <div class="fui-cell-content">{$article['content']}</div>
+        </div>
+    </div>
+</div>
+{template '_footer'}

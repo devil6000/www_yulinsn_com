@@ -1,0 +1,142 @@
+{template '_header'}
+<script type="text/javascript" src="../addons/ewei_shopv2/static/js/dist/area/cascade.js"></script>
+<style>
+    .checkbox-inline{
+        display: block;
+    }    .btns a i{
+        display: inline-block;
+        width: 100%;
+        height: 20px;
+        background: #f95959;
+    }
+    .btn-color {
+        width: 25px;
+        height: 25px;
+        border: 1px solid #fff;
+        margin: 2px;
+        padding: 0;
+    }
+
+</style>
+<div class="page-header">
+    当前位置：<span class="text-primary">{if !empty($item['id'])}编辑{else}添加{/if}企业
+        <small>{if !empty($item['id'])}修改【{$item['storename']}】{/if}</small>
+    </span>
+</div>
+
+<div class="page-content">
+    {ifp 'company.add'}
+    <div class="page-sub-toolbar">
+        <a class="btn btn-primary btn-sm" href="{php echo webUrl('company/bussiness/add')}">添加新企业</a>
+    </div>
+    {/if}
+<form action="" method="post" class="form-horizontal form-validate" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{$item['id']}"/>
+
+    <div class="form-group">
+        <label class="col-lg control-label must">门店名称</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="storename" class="form-control" value="{$item['storename']}"
+                   data-rule-required="true"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label must">门店LOGO</label>
+        <div class="col-sm-9 col-xs-12">
+            {php echo tpl_form_field_image2('logo',$item['logo'])}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label must">省市区 :</label>
+        <div class="col-sm-9 col-xs-12">
+            <p>
+                <select id="sel-provance" name="province" onChange="selectCity();" class="select form-control select-group" style="width:123px;display:inline;">
+                    <option value="" selected="true">省/直辖市</option>
+                </select>
+                <select id="sel-city" name="city" onChange="selectcounty(0)" class="select form-control select-group" style="width:135px;display:inline;">
+                    <option value="" selected="true">请选择</option>
+                </select>
+                <select id="sel-area" name="area" onChange="selectstreet(0)" class="select form-control select-group" style="width:130px;display:inline;">
+                    <option value="" selected="true">请选择</option>
+                </select>
+
+                {if !empty($new_area) && !empty($address_street)}
+                <select id="sel-street" name="street" class="select form-control select-group" style="width:220px;display:none;margin-top: 10px;">
+                    <option value="" selected="true">请选择</option>
+                </select>
+                {/if}
+            </p>
+
+            <input type="hidden" name="chose_province_code" id="chose_province_code" value="{$item['provincecode']}" />
+            <input type="hidden" name="chose_city_code" id="chose_city_code" value="{$item['citycode']}" />
+            <input type="hidden" name="chose_area_code" id="chose_area_code" value="{$item['areacode']}" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label must">门店电话</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="tel" class="form-control" value="{$item['tel']}" data-rule-required="true"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label must">门店位置</label>
+        <div class="col-sm-9 col-xs-12">
+            {php echo tpl_form_field_position('map',array('lng'=>$item['lng'],'lat'=>$item['lat']))}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label must">门店地址</label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="text" name="address" class="form-control" value="{$item['address']}" data-rule-required="true"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg control-label">联系人信息</label>
+        <div class="col-sm-10 col-xs-12">
+                <label class="radio-inline" style="float: left;padding-left:0px;">姓名</label>
+                <div class="col-sm-9 col-xs-12" style="width: 120px; float: left; margin: 0px 20px 0px -5px;">
+                    <input type="text" value="{$item['realname']}" class="form-control" name="realname"
+                           style="width:120px;padding:5px;">
+                </div>
+                <label class="radio-inline" style="float: left;">电话</label>
+                <div class="col-sm-9 col-xs-12" style="width: 120px; float: left; margin: 0px 20px 0px -5px;">
+                    <input type="text" value="{$item['mobile']}" class="form-control" name="mobile"
+                           style="width:120px;padding:5px;">
+                </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">门店简介</label>
+        <div class="col-sm-9 col-xs-12">
+            {ife 'store' $item}
+            <textarea name="desc" class="form-control richtext" rows="5">{$item['desc']}</textarea>
+            {else}
+            <div class='form-control-static'>{$item['desc']}</div>
+            {/if}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg control-label">门店介绍</label>
+        <div class="col-sm-9 col-xs-12">
+            {php echo tpl_ueditor('content',$item['content'],array('height'=>'300'))}
+        </div>
+    </div>
+
+    <div class="form-group"></div>
+    <div class="form-group">
+        <label class="col-lg control-label"></label>
+        <div class="col-sm-9 col-xs-12">
+            <input type="submit" value="提交" class="btn btn-primary"/>
+            <input type="button" name="back" onclick='history.back()' {ifp  'store.add|store.edit'}style='margin-left:10px;'{/if} value="返回列表" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+</div>
+<script language='javascript'>
+    cascdeInit("{php echo $new_area}","{php echo $address_street}","{php echo isset($item['province'])?$item['province']:''}","{php echo isset($item['city'])?$item['city']:''}","{php echo isset($item['area'])?$item['area']:''}","''");
+</script>
+{template '_footer'}

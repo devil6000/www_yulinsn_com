@@ -1,0 +1,78 @@
+{template '_header'}
+<style type="text/css">
+    .fui-page { background-color: #ffffff;}
+    .header-color { background-color: #06b691;}
+    .fui-header a.back:before { border-color: #ffffff;}
+    .fui-video-group { width: 100%; display: flex; flex-direction: column; }
+    .fui-item { margin-left: 0.825rem; margin-right: 0.825rem; display: flex; justify-content: center; padding: 0.575rem 0; border-bottom: solid 1px #eeeeee;}
+    .fui-item-image { width: 5rem; border-radius: 0.48rem; height: 3.05rem; flex: 1; }
+    .fui-item-image img { width: 5rem; height: 3.05rem;}
+    .fui-item-desc { margin-left: 1.245rem; display: flex; flex-direction: column; flex: 2;}
+    .fui-item-text { flex: 2;}
+    .fui-item-times { flex: 1;}
+</style>
+<div class="fui-page fui-page-current">
+    <div class="fui-header header-color">
+        <div class="fui-header-left"><a class="back"></a></div>
+        <div class="title" style="color: #ffffff;">乡村旅游</div>
+        <div class="fui-header-right"></div>
+    </div>
+    <div class="fui-content">
+        <div class='fui-swipe goods-swipe' style="height: 0;">
+            <div class='fui-swipe-wrapper'>
+                {loop $banaras  $index $thumb}
+                <div class='fui-swipe-item'>
+                    {if $index == "0" }
+                    <img src="{php echo tomedia($thumb)}" onload='getHeight(this)'/>
+                    {else}
+                    <img src="{php echo tomedia($thumb)}"/>
+                    {/if}
+                </div>
+                {/loop}
+            </div>
+            <div class='fui-swipe-page'></div>
+        </div>
+        <div class="fui-message fui-message-popup in content-empty" style="display: none; margin: 0; padding: 0; position: relative;">
+            <div class="icon ">
+                <i class="icon icon-information"></i>
+            </div>
+            <div class="content">未找到任何文章~</div>
+        </div>
+        <div class="fui-video-group" id="container"></div>
+        <div class='infinite-loading' style="text-align: center; color: #666;">
+            <span class='fui-preloader'></span>
+            <span class='text'> 正在加载...</span>
+        </div>
+    </div>
+    <script type="text/html" id="get_list">
+        <%each list as item%>
+        <div class="fui-item">
+            <div class="fui-item-image"><a href="{php echo mobileUrl('company/village/detail')}&id=<%item.id%>"><img src="<%item.thumb%>"></a></div>
+            <div class="fui-item-desc">
+                <div class="fui-item-text"><a href="{php echo mobileUrl('company/village/detail')}&id=<%item.id%>"><%item.title%></a></div>
+                <div class="fui-item-times"><%item.createtime%> 浏览 <%item.click%></div>
+            </div>
+        </div>
+        <%/each%>
+    </script>
+
+    <script type="text/javascript">
+        function getHeight (obj){
+            var w = obj.width;
+            var h = obj.height;
+            console.error('h:'+ h +'     w:'+w)
+
+            //var height = ((750*h) / w) / 60 + 'rem';
+            var height = 8.5 + 'rem';
+            $('.fui-swipe.goods-swipe').css('height', height );
+            $('.fui-swipe.goods-swipe .fui-swipe-wrapper .fui-swipe-item img').css('height', height);
+        }
+    </script>
+
+    <script type="text/javascript">
+        require(['../addons/ewei_shopv2/plugin/company/static/js/articles.js'], function (modal) {
+            modal.init({ccate: "{$cates[0]['id']}" })});
+    </script>
+</div>
+
+{template '_footer'}

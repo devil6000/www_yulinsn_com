@@ -1,0 +1,77 @@
+{template '_header'}
+<div class="page-header">
+    当前位置：<span class="text-primary">页面管理 </span>
+</div>
+<div class="page-content">
+    <div class="page-toolbar">
+        {ifp 'company.post'}
+        <a class="btn btn-default btn-sm btn-operation" href="{php echo webUrl('company/add')}"><i class="icow icow-tianjia"></i> 添加</a>
+        {/if}
+    </div>
+    {if count($list)>0}
+    <div class="page-table-header">
+        <input type="checkbox">
+        <div class="btn-group ">
+            {ifp 'company.delete'}
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{php echo webUrl('company/delete')}">
+                <i class='icow icow-shanchu1'></i> 删除
+            </button>
+            {/if}
+        </div>
+    </div>
+    <table class="table table-hover table-responsive">
+        <thead>
+        <tr>
+            <th style="width:25px;"></th>
+            <th style='width:120px'>标题</th>
+            <th>包含内容分类</th>
+            <th style="width: 125px;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $list $row}
+        <tr>
+            <td><input type='checkbox'   value="{$row['id']}"/></td>
+            <td>{$row['title']}</td>
+            <td>{$row['cates_str']}</td>
+            <td>
+                <a class='btn btn-default btn-sm btn-op btn-operation' href="{php echo webUrl('company/edit', array('id' => $row['id']))}">
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+                      {ifp 'shop.verify.store.edit'}
+                        <i class="icow icow-bianji2"></i>
+                      {else}
+                        <i class="icow icow-chakan-copy"></i>
+                      {/if}
+                    </span>
+                </a>
+                <a class='btn btn-default  btn-sm btn-op btn-operation' data-toggle="ajaxRemove"  href="{php echo webUrl('company/delete', array('id' => $row['id']))}" data-confirm="确认删除此企业吗？">
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                        <i class='icow icow-shanchu1'></i>
+                    </span>
+                </a>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+        <tr>
+            <td><input type="checkbox"></td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{php echo webUrl('company/delete')}">
+                        <i class='icow icow-shanchu1'></i> 删除
+                    </button>
+                </div>
+            </td>
+            <td colspan="2" class="text-right"> {$pager}</td>
+        </tr>
+        </tfoot>
+    </table>
+    {else}
+    <div class='panel panel-default'>
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何页面!
+        </div>
+    </div>
+    {/if}
+</div>
+{template '_footer'}

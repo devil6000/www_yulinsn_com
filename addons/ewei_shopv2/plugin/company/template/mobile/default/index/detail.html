@@ -1,0 +1,94 @@
+{template '_header'}
+<style type="text/css">
+    .header-color { background-color: #138ae2;}
+    .fui-header a.back:before { border-color: #ffffff;}
+    .fui-company-logo { width: 100%; height: 8.5rem;}
+    .fui-company-logo img { width: 100%; height: 8.5rem;}
+    .fui-map-group { margin-top: 0.5rem; background-color: #ffffff; line-height: 1.4rem; font-size: 0.8rem; overflow: hidden; position: relative; display: block;}
+    .fui-map-group .fui-map-header { position: relative; padding: 0.75rem 0.6rem 0.65rem; display: flex; align-items: center; line-height: 1.2;}
+    .fui-map-group .fui-map-header .fui-map-label { }
+    .fui-map-group .fui-map-header .fui-map-distance { flex: 1; font-size: .6rem; text-align: right; color: #dedede; margin-right: 0.3rem;}
+    .fui-map-group .fui-map-header .fui-map-btn { color: #ffffff; text-align: right; font-size: 0.65rem; margin-right: .2rem; line-height: 0.65rem;}
+    .fui-map-group .fui-map { width: 100%; height: 11.5rem; padding: 0rem 0.6rem 0.65rem;}
+    .fui-cell-content { padding: 0.75rem 0.6rem 0.65rem; }
+    .fui-cell-content p { line-height: 1.5rem;}
+</style>
+<div class="fui-page fui-page-current">
+    <div class="fui-header header-color">
+        <div class="fui-header-left"><a class="back"></a></div>
+        <div class="title" style="color: #ffffff;">{$company['storename']}</div>
+        <div class="fui-header-right"></div>
+    </div>
+    <div class="fui-content">
+        <div class="fui-company-logo"><img src="{$company['logo']}" /></div>
+        <div class="fui-cell-group">
+            <div class="fui-cell"><div class="fui-cell-title" style="color: #000000; font-weight: bold;">{$company['storename']}</div></div>
+            <div class="fui-cell">
+                <div class="fui-cell-label">地址：</div>
+                <div class="fui-cell-info c000">{$company['province']}{$company['city']}{$company['area']}{$company['address']}</div>
+            </div>
+            <div class="fui-cell">
+                <div class="fui-cell-label">电话：</div>
+                <div class="fui-cell-info c000">{$company['tel']}</div>
+            </div>
+        </div>
+        <div class="fui-map-group">
+            <div class="fui-map-header">
+                <div class="fui-map-label">地理位置</div>
+                <div class="fui-map-distance">距离 <span id="distance">100000</span>km</div>
+                <div class="fui-map-btn">
+                    <a class="btn btn-default btn-sm" style="background: linear-gradient(to right, #23c196, #158cdf); color: #ffffff;" href="http://uri.amap.com/navigation?to=" + {$company['lng']} + "," + {$company['lng']} + "," + {$company['storename']} + "&midwaypoint&mode=car&policy=1&src=mypage&coordinate=gaode&callnative=0'">
+                        <i class="icon icon-dingwei"></i>
+                        导航
+                    </a>
+                </div>
+            </div>
+            <div class="fui-map">
+                <div id="map" style="width: 100%; height: 100%"></div>
+            </div>
+        </div>
+        <div class="fui-cell-group">
+            <div class="fui-cell-title">企业介绍</div>
+            <div class="fui-cell-content">{$company['content']}</div>
+        </div>
+    </div>
+</div>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=Y3UBZ-IQU6X-KBM46-ZLOWB-NCRKF-AOF43"></script>
+<script type="text/javascript">
+    $(function () {
+        /*
+        var id = "{$company['id']}";
+        var lat,lng;
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+                lat = r.point.lat;
+                lng = r.point.lng;
+            }
+
+            core.json('company/index/distance', {lat: lat,lng: lng,id: id}, function (ret) {
+                if(ret.status == 1){
+                    $('#distance').html(ret.result.distance);
+                }else{
+                    $('#distance').html(100000);
+                }
+            })
+        });
+        */
+
+
+        var map_lat = {$company['lat']};
+        var map_lng = {$company['lng']};
+
+        var center = new qq.maps.LatLng(map_lat, map_lng);
+        var map = new qq.maps.Map(document.getElementById('map'),{
+            center: center,
+            zoom: 13
+        });
+        var marker = new qq.maps.Marker({
+            position: center,
+            map: map,
+        });
+    })
+</script>
+{template '_footer'}

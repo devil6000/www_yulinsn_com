@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+.gitignore
+.htaccess
+.idea/
+MP_verify_J4SzMIk7NRaPKHK4.txt
+data/logs/
+data/tpl/
+addons/ewei_shopv2/data/
+attachment/
