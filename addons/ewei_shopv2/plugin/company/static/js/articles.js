@@ -56,7 +56,7 @@ define(['core', 'tpl'], function(core, tpl) {
             ccate: modal.ccate
         }, function(ret) {
             var result = ret.result;
-            if (result.list.length <= 0) {
+            if (result.list.length <= 0 && modal.page == 1) {
                 $('.content-empty').show();
                 $('.fui-content').infinite('stop')
             } else {
