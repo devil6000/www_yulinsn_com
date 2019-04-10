@@ -1,0 +1,89 @@
+{template '_header'}
+
+<div class="page-header">
+    当前位置：<span class="text-primary">视频管理 </span>
+</div>
+<div class="page-content">
+    <form action="./index.php" method="get" class="form-horizontal" role="form">
+        <input type="hidden" name="c" value="site" />
+        <input type="hidden" name="a" value="entry" />
+        <input type="hidden" name="m" value="ewei_shopv2" />
+        <input type="hidden" name="do" value="web" />
+        <input type="hidden" name="r"  value="company.video" />
+        <div class="page-toolbar">
+            <div class="col-sm-3">
+                {ifp 'company.video.post'}
+                <a class="btn btn-primary btn-sm" href="{php echo webUrl('company/video/add')}"><i class="icon icon-tianjia"></i> 新增视频</a>
+                {/if}
+            </div>
+            <div class="col-sm-6 pull-right">
+                <div class="input-group">
+                    <input type="text" class="input-sm form-control" name='keyword' value="{$_GPC['keyword']}" placeholder="请输入关键词">
+                    <span class="input-group-btn"><button class="btn btn-primary" type="submit"> 搜索</button> </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    {if count($list) > 0}
+    <div class="page-table-header">
+        <input type="checkbox">
+        <div class="btn-group">
+            {ifp 'company.video.delete'}
+            <button class="btn btn-default btn-sm btn-operation" type="button" data-toggle='batch-remove' data-confirm="确认要删除?" data-href="{php echo webUrl('company/video/delete')}">
+                <i class='icow icow-shanchu1'></i> 删除
+            </button>
+            {/if}
+        </div>
+    </div>
+    <table class="table table-hover table-responsive">
+        <thead>
+        <tr>
+            <th style="width: 25px;"></th>
+            <th style="width: 200px;">视频标题</th>
+            <th>url</th>
+            <th style="width: 100px;">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {loop $list $row}
+        <tr>
+            <td><input type="checkbox" value="{$row['id']}" /></td>
+            <td>{$row['title']}</td>
+            <td>
+                <a href="javascript:;" class="js-clip" title="点击复制链接" data-url="{$row['url']}">
+                    {$row['url']}
+                </a>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <a class='btn btn-default btn-sm btn-op btn-operation' href="{php echo webUrl('company/video/edit', array('id' => $row['id']))}">
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="编辑">
+                        <i class="icow icow-bianji2"></i>
+                    </span>
+                    </a>
+                    <a class='btn btn-default  btn-sm btn-op btn-operation' data-toggle="ajaxRemove"  href="{php echo webUrl('company/video/delete', array('id' => $row['id']))}" data-confirm="确认删除视频吗？">
+                    <span data-toggle="tooltip" data-placement="top" title="" data-original-title="删除">
+                        <i class='icow icow-shanchu1'></i>
+                    </span>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        {/loop}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="4">{$pager}</td>
+        </tr>
+        </tfoot>
+    </table>
+    {else}
+    <div class="panel panel-default">
+        <div class='panel-body' style='text-align: center;padding:30px;'>
+            暂时没有任何视频
+        </div>
+    </div>
+    {/if}
+</div>
+
+{template '_footer'}

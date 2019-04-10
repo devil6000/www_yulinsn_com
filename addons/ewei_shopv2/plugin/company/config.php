@@ -19,6 +19,7 @@ return array(
         'icon'          => 'page',
         'items'         => array(
             array('title' => '企业管理', 'route' => 'bussiness'),
+            array('title' => '视频管理', 'route' => 'video'),
             array(
                 'title' => '设置',
                 'items' => array(

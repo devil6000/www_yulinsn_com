@@ -43,5 +43,15 @@ create table `ims_ewei_shop_company_page`(
   primary key(`id`)
 );
 
+/* ims_ewei_shop_company_video */
+create table `ims_ewei_shop_company_video`(
+  `id` int(10) not null auto_increment,
+  `uniacid` int(4) null,
+  `title` varchar(255) not null,
+  `createtime` int(6) null default 0,
+  `url` VARCHAR(255) not null,
+  primary key(`id`)
+);
+
 insert into `ims_ewei_shop_plugin`(`displayorder`,`identity`,`category`,`name`,`version`,`author`,`status`,`thumb`,`isv2`)
 values(55,'company','tool','公司网站',1.0,'官方',1,'../addons/ewei_shopv2/static/images/pc.jpg',1)
