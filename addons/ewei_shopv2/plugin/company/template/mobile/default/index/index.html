@@ -1,9 +1,12 @@
 {template '_header'}
 <style type="text/css">
     .fui-page { background-color: #ffffff;}
-    .header-color { background-color: #06b691;}
+    .header-color { background-color: #138ae2;}
+    .fui-header a.back:before { border-color: #ffffff;}
+    .fui-header:after { border-bottom: none;}
+    .fui-searchbar { background: linear-gradient(#1897d0,#23c097);}
+    .fui-company-desc { position: absolute; border: 0; height: 5rem; background: #ffffff; width: 100%; display: flex;}
 </style>
-<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=Y3UBZ-IQU6X-KBM46-ZLOWB-NCRKF-AOF43"></script>
 <div class="fui-page fui-page-current">
     <div class="fui-header header-color">
         <div class="fui-header-left"><a class="back"></a></div>
@@ -11,42 +14,63 @@
         <div class="fui-header-right"></div>
     </div>
     <div class="fui-content">
-        <div class="fui-page-map" id="container" style="width: 100%; height: 100%;"></div>
-        <div class="fui-company-desc"></div>
+        <form action="{php echo mobileUrl('company')}" method="post">
+            <div class="fui-searchbar">
+                <div class="searchbar center">
+                    <div class="search-input">
+                        <input type="search" name='keywords' class="search" placeholder="输入关键字...">
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="fui-page-map" id="container" style="width: 100%; height: calc(100% - 7.2rem);"></div>
+        <div class="fui-company-desc">
+            <div class="fui-company-logo"><img src="" /></div>
+            <div class="fui-company-info">
+                <div class="fui-company-name"></div>
+                <div class="fui-company-address"></div>
+                <div class="fui-company-distance"></div>
+            </div>
+            <div class="fui-company-navigation"></div>
+        </div>
     </div>
 </div>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=b6USN6hip8zFGCr1fH1fE2Is"></script>
 <script type="text/javascript">
-    $(function () {
-        var companys = {php echo json_encode($companys)};
-        companys = eval(companys);
+$(function () {
+    var companys = {php echo json_encode($companys)};
+    companys = eval(companys);
 
-        var center = new qq.maps.LatLng(companys[0].lat, companys[0].lng);
-        var map = new qq.maps.Map(document.getElementById('container'),{
-            center: center,
-            zoom: 13
+    var map = new BMap.Map("container");
+    var point = new BMap.Point(companys[0].lng, companys[0].lat);
+    map.centerAndZoom(point,15);
+    map.enableScrollWheelZoom(true);
+    var opts = {type: BMAP_NAVIGATION_CONTROL_SMALL};
+    map.addControl(new BMap.NavigationControl(opts));
+
+    //增加标识
+    $.each(companys, function (i,element) {
+        var icon = new BMap.Icon(element.logo, new BMap.Size(30,30), {
+            anchor: new BMap.Size(30,30)
         });
+        var marker = new BMap.Marker(new BMap.Point(element.lng,element.lat),{icon: icon});
+        marker.addEventListener('click', function () {
+            get_company(element);
+        });
+        map.addOverlay(marker);
+    });
 
-        var markes = new Array();
-        $.each(companys, function (i,element) {
-            var center = new qq.maps.LatLng(element.lat,element.lng);
-            var marker = new qq.maps.Marker({
-                position: center,
-                map: map,
-                //content: element.storename
-            });
-            var info = new qq.maps.InfoWindow({
-                map: map
-            });
-            qq.maps.event.addListener(marker,'click',function () {
-                info.open();
-                info.setContent('<div style="display: flex; flex-direction: row;">' +
-                    '<a href="' + element.url + '"><div style="flex: 1; width: 2rem; height: 2rem;"><img src="' + element.logo + '" style="width: 2rem; height: 2rem;" /></div>' +
-                    '<div style="flex: 2; ">'+ element.storename + '</div></a>' +
-                    '</div>');
-                info.setPosition(center);
-            });
-            markes.push(marker);
-        })
-    })
+    function get_company(arr) {
+
+    }
+
+    //map.setCurrentCity("温州");
+    /*
+    var local = new BMap.LocalSearch(map,{
+        renderOptions:{map: map}
+    });
+    local.search("温州市");
+    */
+})
 </script>
 {template '_footer'}
