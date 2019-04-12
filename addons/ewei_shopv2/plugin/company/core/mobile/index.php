@@ -13,12 +13,25 @@ if(!defined('IN_IA')){
 class Index_EweiShopV2Page extends PluginMobilePage{
     public function main(){
         global $_W,$_GPC;
-        $companys = pdo_fetchall('select * from ' . tablename('ewei_shop_company') . ' where uniacid=:uniacid', array(':uniacid' => $_W['uniacid']));
+
+        $conditions = 'uniacid=:uniacid';
+        $params[':uniacid'] = $_W['uniacid'];
+        $keyword = $_GPC['keywords'];
+        if(!empty($keyword)){
+            $conditions .= ' and storename like :keyword';
+            $params[':keyword'] = "%{$keyword}%";
+        }
+
+        $companys = pdo_fetchall('select * from ' . tablename('ewei_shop_company') . ' where ' . $conditions, $params);
         foreach ($companys as &$item){
             $item['logo'] = tomedia($item['logo']);
             $item['url'] = mobileUrl('company/index/detail', array('id' => $item['id']));
         }
         unset($item);
+
+        if(!empty($companys)){
+            $item = $companys[0];
+        }
 
         include $this->template('company/index/index');
     }
@@ -29,6 +42,12 @@ class Index_EweiShopV2Page extends PluginMobilePage{
         $company = pdo_fetch('select * from ' . tablename('ewei_shop_company') . ' where id=:id and uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
         $company['logo'] = tomedia($company['logo']);
 
+        $lat = $_SESSION['lat'];
+        $lng = $_SESSION['lng'];
+
+        $distance = m('util')->GetDistance($lat, $lng, $company['lat'], $company['lng'], 2);
+        $company['distance'] = $distance;
+
         include $this->template('company/index/detail');
     }
 
@@ -38,13 +57,40 @@ class Index_EweiShopV2Page extends PluginMobilePage{
     public function distance(){
         global $_W,$_GPC;
         $id = intval($_GPC['id']);
-        $lat = $_GPC['lat'];
-        $lng = $_GPC['lng'];
+        $lat = $_SESSION['lat'];
+        $lng = $_SESSION['lng'];
 
         $company = pdo_fetch('select lat,lng from ' . tablename('ewei_shop_company') . ' where id=:id and uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 
         $distance = m('util')->GetDistance($lat, $lng, $company['lat'], $company['lng'], 2);
+        if(empty($distance) || $distance > 100000){
+            $distance = 100000;
+        }
 
         show_json(1, array('distance' => $distance));
+    }
+
+    public function get_distance(){
+        global $_GPC;
+        $_SESSION['lng'] = $_GPC['lng'];
+        $_SESSION['lat'] = $_GPC['lat'];
+        show_json(1);
+    }
+
+    public function get_company(){
+        global $_W,$_GPC;
+        $id = intval($_GPC['id']);
+        $company = pdo_fetch('select * from ' . tablename('ewei_shop_company') . ' where id=:id and uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+        $company['logo'] = tomedia($company['logo']);
+        $company['url'] = mobileUrl('company/index/detail', array('id' => $company['id']));
+        $lat = $_SESSION['lat'];
+        $lng = $_SESSION['lng'];
+
+        $distance = m('util')->GetDistance($lat, $lng, $company['lat'], $company['lng'], 2);
+        if(empty($distance) || $distance > 100000){
+            $distance = 100000;
+        }
+
+        show_json(1, array('distance' => $distance, 'item' => $company));
     }
 }

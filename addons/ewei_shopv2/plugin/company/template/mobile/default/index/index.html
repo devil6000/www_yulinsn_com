@@ -4,8 +4,12 @@
     .header-color { background-color: #138ae2;}
     .fui-header a.back:before { border-color: #ffffff;}
     .fui-header:after { border-bottom: none;}
-    .fui-searchbar { background: linear-gradient(#1897d0,#23c097);}
-    .fui-company-desc { position: absolute; border: 0; height: 5rem; background: #ffffff; width: 100%; display: flex;}
+    .fui-searchbar { background: linear-gradient(#138ae2,#23c097);}
+    .fui-company-desc { position: absolute; border: 0; height: 4rem; background: #ffffff; width: 100%; display: flex; align-items: center; padding: 0 0.35rem;}
+    .fui-company-logo { width: 3rem; height: 2rem;}
+    .fui-company-logo img { width: 3rem; height: 2rem; border-radius: 0.9rem;}
+    .fui-company-info { flex: 1; padding-left: 0.2rem; padding-right: 0.2rem;}
+    .fui-company-navigation { width: 2rem; height: 2rem; border-radius: 2rem; background: #138ae2;}
 </style>
 <div class="fui-page fui-page-current">
     <div class="fui-header header-color">
@@ -23,54 +27,118 @@
                 </div>
             </div>
         </form>
-        <div class="fui-page-map" id="container" style="width: 100%; height: calc(100% - 7.2rem);"></div>
+        <div class="fui-page-map" id="container" style="width: 100%; height: calc(100% - 6.2rem);"></div>
         <div class="fui-company-desc">
-            <div class="fui-company-logo"><img src="" /></div>
+            {if !empty($companys)}
+            <div class="fui-company-logo"><img src="{$item['logo']}" /></div>
             <div class="fui-company-info">
-                <div class="fui-company-name"></div>
-                <div class="fui-company-address"></div>
-                <div class="fui-company-distance"></div>
+                <div class="fui-company-name">
+                    <a href="{php echo mobileUrl('company/index/detail', array('id' => $item['id']))}">{$item['storename']}</a>
+                </div>
+                <div class="fui-company-address">{$item['address']}</div>
+                <div class="fui-company-distance">100000</div>
             </div>
             <div class="fui-company-navigation"></div>
+            {/if}
         </div>
     </div>
 </div>
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=b6USN6hip8zFGCr1fH1fE2Is"></script>
 <script type="text/javascript">
-$(function () {
-    var companys = {php echo json_encode($companys)};
-    companys = eval(companys);
+    require(['core'], function (core) {
+        var companys = {php echo json_encode($companys)};
+        companys = eval(companys);
 
-    var map = new BMap.Map("container");
-    var point = new BMap.Point(companys[0].lng, companys[0].lat);
-    map.centerAndZoom(point,15);
-    map.enableScrollWheelZoom(true);
-    var opts = {type: BMAP_NAVIGATION_CONTROL_SMALL};
-    map.addControl(new BMap.NavigationControl(opts));
+        var map = new BMap.Map("container");
+        var point = new BMap.Point(companys[0].lng, companys[0].lat);
+        map.centerAndZoom(point,15);
 
-    //增加标识
-    $.each(companys, function (i,element) {
-        var icon = new BMap.Icon(element.logo, new BMap.Size(30,30), {
-            anchor: new BMap.Size(30,30)
+        //获取当前位置的经纬度
+        var geolocation = new BMap.Geolocation();
+        geolocation.getCurrentPosition(function (r) {
+            if(this.getStatus() == BMAP_STATUS_SUCCESS){
+                //core.json('company/index/get_distance', {lat: r.point.lat, lng: r.point.lng}, function (res) {})
+                set_distance(r.point.lng,r.point.lat);
+            }
         });
-        var marker = new BMap.Marker(new BMap.Point(element.lng,element.lat),{icon: icon});
-        marker.addEventListener('click', function () {
-            get_company(element);
+
+        //自定义标志
+        function mymarker(id,point,img) {
+            this._point = point;
+            this._logo = img;
+            this._id = id;
+        }
+        mymarker.prototype = new BMap.Overlay();
+        mymarker.prototype.initialize = function (mp) {
+            this._map = mp;
+            var div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.zIndex = BMap.Overlay.getZIndex(this._point.lat);
+            div.style.height = "60px";
+            div.style.width = "34px";
+            div.style.background = "url(http://www.yulinsn.com/addons/ewei_shopv2/plugin/company/static/images/marker.png) no-repeat";
+            div.id = this._id;
+            var img = this._img = document.createElement('img');
+            img.style.position = "absolute";
+            img.style.width = "24px";
+            img.style.height = "24px";
+            img.style.left = "5px";
+            img.style.top = "14px";
+            img.style.borderRadius = "24px";
+            img.src = this._logo;
+            div.appendChild(img);
+
+            map.getPanes().markerPane.appendChild(div);
+
+            //禁止拖动地图是才能使用
+            div.addEventListener('click', function () {
+                get_company(this.id);
+            });
+
+            this._div = div;
+
+            return div;
+        }
+
+        mymarker.prototype.draw = function () {
+            var map = this._map;
+            var pixel = map.pointToOverlayPixel(this._point);
+            this._div.style.left = pixel.x - 17 + "px";
+            this._div.style.top = pixel.y - 30 + "px";
+        }
+
+        //增加标识
+        $.each(companys, function (i,element) {
+            var marker = new mymarker(element.id,new BMap.Point(element.lng,element.lat),element.logo);
+            map.addOverlay(marker);
         });
-        map.addOverlay(marker);
+
+        map.addEventListener('touchmove', function (e) {
+            map.enableDragging();
+        });
+
+        map.addEventListener('touchend', function (e) {
+            map.disableDragging();
+        });
+
+        map.disableDragging();
+
+        function get_company(id) {
+            core.json('company/index/get_company', {id:id}, function (res) {
+                if(res.status == 1){
+                    $('.fui-company-logo').find('img').attr('src',res.result.item.logo);
+                    $('.fui-company-name').find('a').html(res.result.item.storename);
+                    $('.fui-company-name').find('a').attr('href',res.result.item.url);
+                    $('.fui-company-address').html(res.result.item.address);
+                    $('.fui-company-distance').html(res.result.distance);
+                }
+            });
+        }
+
+        function set_distance(lng,lat) {
+            core.json('company/index/get_distance', {lat: lat, lng: lng}, function (res) {});
+        }
     });
 
-    function get_company(arr) {
-
-    }
-
-    //map.setCurrentCity("温州");
-    /*
-    var local = new BMap.LocalSearch(map,{
-        renderOptions:{map: map}
-    });
-    local.search("温州市");
-    */
-})
 </script>
 {template '_footer'}
